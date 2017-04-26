@@ -98,9 +98,9 @@ $(document).ready(function(){
 						if(inter=="1"){
 							interval = 100;
 						}else if(inter=="2"){
-							interval = 50;
+							interval = 75;
 						}else{
-							interval = 25
+							interval = 45
 						}
 						init();
 					});
