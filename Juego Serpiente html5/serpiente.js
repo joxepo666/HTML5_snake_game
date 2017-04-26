@@ -5,6 +5,7 @@ $(document).ready(function(){
 	var w = $("#canvas").width();
 	var h = $("#canvas").height();
     var player = "";
+	var interval;
 	
 	//Guardamos en una variable el ancho de la celda, para un control más simple
 	var cw = 10; // ancho de la celda
@@ -23,14 +24,24 @@ $(document).ready(function(){
 		//finalmente, mostramos la puntuación
 		score = 0;
 		
-		//Movemos la serpiente con un timer que la redibuja cada 60ms
+		//Movemos la serpiente con un timer que la redibuja en pantalla
 		if(typeof game_loop != "undefined") clearInterval(game_loop);
-		game_loop = setInterval(paint, 60);
+		game_loop = setInterval(paint, interval);
 	}
     jPrompt('Introduce tu nombre','Tu nombre', 'BIENVENIDO', function(r) {
-        console.log(r);
+        //console.log(r);
         player = r;
-        init();
+		jPrompt('Selecciona dificultad','1:Fácil, 2:Medio, 3:Dificil', 'Hola '+player, function(inter) {
+			if(inter=="1"){
+				interval = 100;
+			}else if(inter=="2"){
+				interval = 50;
+			}else{
+				interval = 25
+			}
+			init();
+		});
+        //init();
     });
 	
 	function create_snake()
@@ -79,10 +90,20 @@ $(document).ready(function(){
 		if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || check_collision(nx, ny, snake_array))
 		{
 			//reiniciar
-            jConfirm('Tu puntuación es de: '+score, 'GAME OVER', function(r) {
-                console.log(r);
+			clearInterval(game_loop);
+            jConfirm(player +': tu puntuación es de '+score+' puntos', 'GAME OVER', function(r) {
+                //console.log(r);
                 if(r){
-                    init();
+                    jPrompt('Selecciona dificultad','1:Fácil, 2:Medio, 3:Dificil', 'Hola '+player, function(inter) {
+						if(inter=="1"){
+							interval = 100;
+						}else if(inter=="2"){
+							interval = 50;
+						}else{
+							interval = 25
+						}
+						init();
+					});
 			        return;
                 }else{
                     window.top.close();
@@ -98,6 +119,10 @@ $(document).ready(function(){
 		//añadimos una nueva celda y sumamos un punto
 		if(nx == food.x && ny == food.y)
 		{
+			//Cada vez que cogemos comida, aumentamos un poquito la velocidad
+			clearInterval(game_loop);
+			interval = interval - 1;
+			game_loop = setInterval(paint, interval);
 			var tail = {x: nx, y: ny};
 			score++;
 			create_food();
